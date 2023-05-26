@@ -3,7 +3,9 @@ use imageproc::drawing::{draw_cubic_bezier_curve_mut, draw_text_mut};
 use imageproc::noise::gaussian_noise_mut;
 use rand::{thread_rng, Rng};
 use rusttype::{Font, Scale};
+use std::io;
 use std::io::Cursor;
+use std::io::Write;
 
 static BASIC_CHAR: [char; 54] = [
     '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M',
@@ -254,4 +256,15 @@ impl CaptchaBuilder {
 
         Captcha { text, image: bytes }
     }
+}
+
+fn main() -> io::Result<()> {
+    let captcha = CaptchaBuilder::new().length(5).build();
+    let mut output = io::stdout().lock();
+
+    output.write_all(captcha.text.as_bytes())?;
+    output.write_all(captcha.image.as_slice())?;
+
+    output.flush()?;
+    Ok(())
 }
